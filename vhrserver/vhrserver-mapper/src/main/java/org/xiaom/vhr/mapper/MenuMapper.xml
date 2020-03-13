@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.xiaom.vhr.mapper.MenuMapper">
+  <resultMap id="BaseResultMap" type="org.xiaom.vhr.model.Menu">
+    <result column="id" jdbcType="INTEGER" property="id" />
+    <result column="url" jdbcType="VARCHAR" property="url" />
+    <result column="path" jdbcType="VARCHAR" property="path" />
+    <result column="component" jdbcType="VARCHAR" property="component" />
+    <result column="name" jdbcType="VARCHAR" property="name" />
+    <result column="iconCls" jdbcType="VARCHAR" property="iconCls" />
+    <result column="parentId" jdbcType="INTEGER" property="parentId" />
+    <result column="enabled" jdbcType="BIT" property="enabled" />
+    <association property="meta" javaType="org.xiaom.vhr.model.Meta">
+      <result column="keepAlive" property="keepAlive" jdbcType="BIT"/>
+      <result column="requireAuth" property="requireAuth" jdbcType="BIT"/>
+    </association>
+  </resultMap>
+
+  <resultMap id="Menus2" type="org.xiaom.vhr.model.Menu" extends="BaseResultMap">
+    <collection property="children" ofType="org.xiaom.vhr.model.Menu">
+      <id column="id2" property="id" jdbcType="INTEGER"/>
+      <result column="url2" property="url" jdbcType="VARCHAR"/>
+      <result column="path2" property="path" jdbcType="VARCHAR"/>
+      <result column="component2" property="component" jdbcType="VARCHAR"/>
+      <result column="name2" property="name" jdbcType="VARCHAR"/>
+      <result column="iconCls2" property="iconCls" jdbcType="VARCHAR"/>
+      <result column="parentId2" property="parentId" jdbcType="INTEGER"/>
+      <result column="enabled2" property="enabled" jdbcType="BIT"/>
+      <association property="meta" javaType="org.xiaom.vhr.model.Meta">
+        <result column="keepAlive2" property="keepAlive" jdbcType="BIT"/>
+        <result column="requireAuth2" property="requireAuth" jdbcType="BIT"/>
+      </association>
+    </collection>
+  </resultMap>
+
+  <resultMap id="MenuWithRole" type="org.xiaom.vhr.model.Menu" extends="BaseResultMap">
+    <collection property="roles" ofType="org.xiaom.vhr.model.Role">
+      <id column="rid" property="id"/>
+      <result column="rname" property="name"/>
+      <result column="rnameZh" property="nameZh"/>
+    </collection>
+  </resultMap>
+  <!-- 查询三级菜单 -->
+  <resultMap id="MenuWithChildren" type="org.xiaom.vhr.model.Menu" extends="BaseResultMap">
+    <id column="id1" property="id"/>
+    <result column="name1" property="name"/>
+    <collection property="children" ofType="org.xiaom.vhr.model.Menu">
+      <id column="id2" property="id"/>
+      <result column="name2" property="name"/>
+      <collection property="children" ofType="org.xiaom.vhr.model.Menu">
+        <id column="id3" property="id"/>
+        <result column="name3" property="name"/>
+      </collection>
+    </collection>
+  </resultMap>
+  <insert id="insert" parameterType="org.xiaom.vhr.model.Menu">
+    insert into menu (id, url, path, 
+      component, name, iconCls, 
+      keepAlive, requireAuth, parentId, 
+      enabled)
+    values (#{id,jdbcType=INTEGER}, #{url,jdbcType=VARCHAR}, #{path,jdbcType=VARCHAR}, 
+      #{component,jdbcType=VARCHAR}, #{name,jdbcType=VARCHAR}, #{iconCls,jdbcType=VARCHAR},
+      #{keepalive,jdbcType=BIT}, #{requireauth,jdbcType=BIT}, #{parentId,jdbcType=INTEGER},
+      #{enabled,jdbcType=BIT})
+  </insert>
+  <insert id="insertSelective" parameterType="org.xiaom.vhr.model.Menu">
+    insert into menu
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="url != null">
+        url,
+      </if>
+      <if test="path != null">
+        path,
+      </if>
+      <if test="component != null">
+        component,
+      </if>
+      <if test="name != null">
+        name,
+      </if>
+      <if test="iconCls != null">
+        iconCls,
+      </if>
+      <if test="keepalive != null">
+        keepAlive,
+      </if>
+      <if test="requireauth != null">
+        requireAuth,
+      </if>
+      <if test="parentId != null">
+        parentId,
+      </if>
+      <if test="enabled != null">
+        enabled,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="url != null">
+        #{url,jdbcType=VARCHAR},
+      </if>
+      <if test="path != null">
+        #{path,jdbcType=VARCHAR},
+      </if>
+      <if test="component != null">
+        #{component,jdbcType=VARCHAR},
+      </if>
+      <if test="name != null">
+        #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="iconCls != null">
+        #{iconCls,jdbcType=VARCHAR},
+      </if>
+      <if test="keepalive != null">
+        #{keepalive,jdbcType=BIT},
+      </if>
+      <if test="requireauth != null">
+        #{requireauth,jdbcType=BIT},
+      </if>
+      <if test="parentId != null">
+        #{parentId,jdbcType=INTEGER},
+      </if>
+      <if test="enabled != null">
+        #{enabled,jdbcType=BIT},
+      </if>
+    </trim>
+  </insert>
+
+  <select id="getAllMenusWithRole" resultMap="MenuWithRole">
+        select m.*,r.`id` as rid,r.`name` as rname,r.`nameZh` as rnameZh from menu m,menu_role mr,role r where
+        m.`id`=mr.`mid` and mr.`rid`=r.`id` order by m.`id`
+  </select>
+  <select id="getAllMenus" resultMap="MenuWithChildren">
+        select m1.`id` as id1,m1.`name` as name1,m2.`id` as id2,m2.`name` as name2,m3.`id` as id3,m3.`name` as name3
+        from menu m1,menu m2,menu m3 where m1.`id`=m2.`parentId` and m2.`id`=m3.`parentId` and m3.`enabled`=true order
+        by m1.`id`,m2.`id`,m3.`id`
+  </select>
+
+  <select id="getMenusByHrId" resultMap="Menus2">
+    select distinct m1.*, m2.`id` as id2,m2.`component` as component2,m2.`enabled` as enabled2,m2.`iconCls` as
+        iconCls2,m2.`keepAlive` as keepAlive2,m2.`name` as name2,m2.`parentId` as parentId2,m2.`requireAuth` as
+        requireAuth2,m2.`path` as path2
+        from menu m1, menu m2, menu_role mr, hr_role hrr
+        where
+        m1.`id`=m2.`parentId` and mr.`mid`=m2.`id` and hrr.`rid`=mr.`rid` and hrr.`hrid`=#{hrid} and m2.`enabled`=true
+        order by m1.`id`,m2.`id`
+  </select>
+</mapper>

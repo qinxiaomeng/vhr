@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.xiaom.vhr.mapper.JobLevelMapper">
+  <resultMap id="BaseResultMap" type="org.xiaom.vhr.model.JobLevel">
+    <result column="id" jdbcType="INTEGER" property="id" />
+    <result column="name" jdbcType="VARCHAR" property="name" />
+    <result column="titleLevel" jdbcType="CHAR" property="titleLevel" />
+    <result column="createDate" jdbcType="TIMESTAMP" property="createDate" />
+    <result column="enabled" jdbcType="BIT" property="enabled" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, name, titleLevel, createDate, enabled
+  </sql>
+  <select id="getAllJobLevels" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List"></include>
+    from joblevel
+  </select>
+  <select id="getEnabledJobLevels" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List"></include>
+    from joblevel
+    where enabled=1
+  </select>
+  <insert id="insert" parameterType="org.xiaom.vhr.model.JobLevel">
+    insert into joblevel (id, name, titleLevel, 
+      createDate, enabled)
+    values (#{id,jdbcType=INTEGER}, #{name,jdbcType=VARCHAR}, #{titleLevel,jdbcType=CHAR},
+      #{createDate,jdbcType=TIMESTAMP}, #{enabled,jdbcType=BIT})
+  </insert>
+  <insert id="insertSelective" parameterType="org.xiaom.vhr.model.JobLevel">
+    insert into joblevel
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="name != null">
+        name,
+      </if>
+      <if test="titleLevel != null">
+        titleLevel,
+      </if>
+      <if test="createDate != null">
+        createDate,
+      </if>
+      <if test="enabled != null">
+        enabled,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="name != null">
+        #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="titleLevel != null">
+        #{titlelevel,jdbcType=CHAR},
+      </if>
+      <if test="createDate != null">
+        #{createdate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="enabled != null">
+        #{enabled,jdbcType=BIT},
+      </if>
+    </trim>
+  </insert>
+</mapper>
