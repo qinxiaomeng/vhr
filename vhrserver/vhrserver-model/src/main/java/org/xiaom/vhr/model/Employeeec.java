@@ -17,6 +17,16 @@ public class Employeeec {
 
     private String remark;
 
+    private Employee emp;
+
+    public Employee getEmp() {
+        return emp;
+    }
+
+    public void setEmp(Employee emp) {
+        this.emp = emp;
+    }
+
     public Integer getId() {
         return id;
     }

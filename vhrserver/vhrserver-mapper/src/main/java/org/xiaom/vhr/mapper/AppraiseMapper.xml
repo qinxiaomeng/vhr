@@ -9,6 +9,39 @@
     <result column="appContent" jdbcType="VARCHAR" property="appcontent" />
     <result column="remark" jdbcType="VARCHAR" property="remark" />
   </resultMap>
+  <resultMap id="ResultWithEmployee" type="org.xiaom.vhr.model.Appraise" extends="BaseResultMap">
+    <association property="emp" javaType="org.xiaom.vhr.model.Employee">
+      <id column="eid" property="id"/>
+      <result column="eName" property="name"/>
+    </association>
+  </resultMap>
+  <select id="getAppraiseWithEmpByPage" resultMap="ResultWithEmployee">
+    select app.*, e.name as eName
+    from appraise app, employee e
+    where app.eid = e.id
+    <if test="empName != null">
+        and e.name like concat('%', #{empName}, '%')
+    </if>
+    <if test="beginDateScope != null">
+        and app.appDate between #{beginDateScope[0]} and #{beginDateScope[1]}
+    </if>
+    <if test="page != null and size != null">
+      limit #{page}, #{size}
+    </if>
+    order by app.appDate desc
+  </select>
+
+  <select id="getTotal" resultType="java.lang.Long">
+    select count(1)
+    from appraise app, employee e
+    where app.eid = e.id
+    <if test="empName != null">
+      and e.name like concat('%', #{empName}, '%')
+    </if>
+    <if test="beginDateScope != null">
+      and app.appDate between #{beginDateScope[0]} and #{beginDateScope[1]}
+    </if>
+  </select>
   <insert id="insert" parameterType="org.xiaom.vhr.model.Appraise">
     insert into appraise (id, eid, appDate, 
       appResult, appContent, remark

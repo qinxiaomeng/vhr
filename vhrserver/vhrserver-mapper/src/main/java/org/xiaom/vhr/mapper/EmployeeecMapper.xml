@@ -10,6 +10,44 @@
     <result column="ecType" jdbcType="INTEGER" property="ectype" />
     <result column="remark" jdbcType="VARCHAR" property="remark" />
   </resultMap>
+
+  <resultMap id="ResultWithEmployee" type="org.xiaom.vhr.model.Employeeec" extends="BaseResultMap">
+    <association property="emp" javaType="org.xiaom.vhr.model.Employee">
+      <id column="eid" property="id"/>
+      <result column="eName" property="name"/>
+    </association>
+  </resultMap>
+
+  <sql id="BaseColumnList">
+    id, eid, ecDate, ecReason, ecPoint, ecType, remark
+  </sql>
+
+  <select id="listEmployeecInfoByPage" resultMap="ResultWithEmployee">
+    select ec.* , e.`name` as eName
+    from employeeec ec, employee e
+    where ec.eid = e.id
+    <if test="empName != null">
+        and e.name like concat('%', #{empName}, '%')
+    </if>
+    <if test="beginDateScope != null">
+        and ec.ecDate between #{beginDateScope[0]} and #{beginDateScope[1]}
+    </if>
+    <if test="page != null and size != null">
+      limit #{page}, #{size}
+    </if>
+  </select>
+
+  <select id="getTotal" resultType="java.lang.Long">
+    select count(1)
+    from employeeec ec, employee e
+    where ec.eid = e.id
+    <if test="empName != null">
+      and e.name like concat('%', #{empName}, '%')
+    </if>
+    <if test="beginDateScope != null">
+      and ec.Date between #{beginDateScope[0]} and #{beginDateScope[1]}
+    </if>
+  </select>
   <insert id="insert" parameterType="org.xiaom.vhr.model.Employeeec">
     insert into employeeec (id, eid, ecDate, 
       ecReason, ecPoint, ecType, 

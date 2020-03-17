@@ -1,5 +1,7 @@
 package org.xiaom.vhr.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import java.util.Date;
 
 public class Appraise {
@@ -7,6 +9,7 @@ public class Appraise {
 
     private Integer eid;
 
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "Asia/Shanghai")
     private Date appdate;
 
     private String appresult;
@@ -14,6 +17,16 @@ public class Appraise {
     private String appcontent;
 
     private String remark;
+
+    private Employee emp;
+
+    public Employee getEmp() {
+        return emp;
+    }
+
+    public void setEmp(Employee emp) {
+        this.emp = emp;
+    }
 
     public Integer getId() {
         return id;
